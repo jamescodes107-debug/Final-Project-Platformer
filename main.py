@@ -30,11 +30,11 @@ level_grid = [
         "                    ",
         "                    ",
         "                    ",
+        "            D       ",
         "                    ",
-        "               G    ",
-        "   P P         P    ",
+        "   P P      P      P",
         "S                   ",
-        "P     PP            ",
+        "P                   ",
         "                    ",
         "PPLLLLPPPPLLLLPPPPPP"
     ]
@@ -56,6 +56,10 @@ for row_idx, row in enumerate(level_grid):
         
         if char == "P":
             p = Platform(x, y, block_size, block_size)
+            platforms.add(p)
+            all_sprites.add(p)
+        elif char == "D":
+            p = Platform(x, y, block_size, block_size, double_jump_platform=True)
             platforms.add(p)
             all_sprites.add(p)
         elif char == "L":

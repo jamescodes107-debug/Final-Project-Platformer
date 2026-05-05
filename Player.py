@@ -28,6 +28,8 @@ class Player(pygame.sprite.Sprite):
         self.dash_speed = 30
         self.dash_max_duration = 5
         self.dash_timer = 0
+        
+        self.can_double_jump = False
 
     def update(self, platforms):
         self.handle_input()
@@ -67,7 +69,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] or keys[pygame.K_UP]:
             self.jump()
             
-        if keys[pygame.K_LSHIFT] and self.can_dash and not self.on_ground and not self.is_dashing:
+        if keys[pygame.K_RSHIFT] and self.can_dash and not self.on_ground and not self.is_dashing:
             self.is_dashing = True
             self.can_dash = False
             self.dash_timer = self.dash_max_duration
@@ -76,14 +78,21 @@ class Player(pygame.sprite.Sprite):
         if self.on_ground:
             self.vel_y = self.jump_strength
             self.on_ground = False
+        elif self.can_double_jump:
+            self.vel_y = self.jump_strength
+            self.can_double_jump = False
 
     def check_horizontal_collisions(self, platforms):
         hits = pygame.sprite.spritecollide(self, platforms, False)
         for hit in hits:
             if self.vel_x > 0: # Moving right, hit left side of platform
                 self.rect.right = hit.rect.left
+                if hasattr(hit, 'double_jump_platform') and hit.double_jump_platform:
+                    self.can_double_jump = True
             elif self.vel_x < 0: # Moving left, hit right side of platform
                 self.rect.left = hit.rect.right
+                if hasattr(hit, 'double_jump_platform') and hit.double_jump_platform:
+                    self.can_double_jump = True
 
     def check_vertical_collisions(self, platforms):
         self.on_ground = False
@@ -94,6 +103,10 @@ class Player(pygame.sprite.Sprite):
                 self.vel_y = 0
                 self.on_ground = True
                 self.can_dash = True
+                if hasattr(hit, 'double_jump_platform') and hit.double_jump_platform:
+                    self.can_double_jump = True
+                else:
+                    self.can_double_jump = False
             elif self.vel_y < 0: # Jumping up, hit bottom of platform
                 self.rect.top = hit.rect.bottom
                 self.vel_y = 0
