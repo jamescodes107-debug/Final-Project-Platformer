@@ -23,20 +23,20 @@ font = pygame.font.SysFont(None, 48)
 # P = Platform, L = Lava (Hazard), G = Goal, S = Start Position (Player)
 level_grid = [
         "                    ",
-        "                    ",
-        "                    ",
-        "                    ",
-        "                    ",
-        "                    ",
-        "                    ",
-        "                    ",
-        "            D       ",
-        "                    ",
-        "   P P      P      P",
-        "S                   ",
-        "P                   ",
-        "                    ",
-        "PPLLLLPPPPLLLLPPPPPP"
+        "G                   ",
+        "PP                 L",
+        "     LLP     P     D",
+        "     PPP           D",
+        "       P           D",
+        "       D  L   LL   D",
+        "       D  P   PD    ",
+        "          P   PD    ",
+        "          P   PD    ",
+        "          D         ",
+        "S  PPP    D         ",
+        "P         D   LL  P ",
+        "          P   PP    ",
+        "PPLLLLLLLLPLLLPPLLLL"
     ]
 
 all_sprites = pygame.sprite.Group()

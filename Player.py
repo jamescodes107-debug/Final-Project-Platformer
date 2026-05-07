@@ -30,9 +30,18 @@ class Player(pygame.sprite.Sprite):
         self.dash_timer = 0
         
         self.can_double_jump = False
+        self.knockback_x = 0
+        self.stored_push_x = 0
 
     def update(self, platforms):
         self.handle_input()
+        
+        if self.knockback_x > 0:
+            self.knockback_x -= 1
+        elif self.knockback_x < 0:
+            self.knockback_x += 1
+            
+        self.vel_x += self.knockback_x
         
         if self.is_dashing:
             self.dash_timer -= 1
@@ -78,9 +87,13 @@ class Player(pygame.sprite.Sprite):
         if self.on_ground:
             self.vel_y = self.jump_strength
             self.on_ground = False
+            self.stored_push_x = 0
         elif self.can_double_jump:
             self.vel_y = self.jump_strength
             self.can_double_jump = False
+            if self.stored_push_x != 0:
+                self.knockback_x = self.stored_push_x
+                self.stored_push_x = 0
 
     def check_horizontal_collisions(self, platforms):
         hits = pygame.sprite.spritecollide(self, platforms, False)
@@ -89,10 +102,20 @@ class Player(pygame.sprite.Sprite):
                 self.rect.right = hit.rect.left
                 if hasattr(hit, 'double_jump_platform') and hit.double_jump_platform:
                     self.can_double_jump = True
+                    self.can_dash = True
+                    self.is_dashing = False
+                    self.stored_push_x = -5
+                else:
+                    self.stored_push_x = 0
             elif self.vel_x < 0: # Moving left, hit right side of platform
                 self.rect.left = hit.rect.right
                 if hasattr(hit, 'double_jump_platform') and hit.double_jump_platform:
                     self.can_double_jump = True
+                    self.can_dash = True
+                    self.is_dashing = False
+                    self.stored_push_x = 5
+                else:
+                    self.stored_push_x = 0
 
     def check_vertical_collisions(self, platforms):
         self.on_ground = False
@@ -105,8 +128,16 @@ class Player(pygame.sprite.Sprite):
                 self.can_dash = True
                 if hasattr(hit, 'double_jump_platform') and hit.double_jump_platform:
                     self.can_double_jump = True
+                    self.is_dashing = False
                 else:
                     self.can_double_jump = False
+                    self.stored_push_x = 0
             elif self.vel_y < 0: # Jumping up, hit bottom of platform
                 self.rect.top = hit.rect.bottom
                 self.vel_y = 0
+                if hasattr(hit, 'double_jump_platform') and hit.double_jump_platform:
+                    self.can_double_jump = True
+                    self.can_dash = True
+                    self.is_dashing = False
+                else:
+                    self.stored_push_x = 0
